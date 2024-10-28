@@ -165,7 +165,11 @@ def build_construct(build_location):
     if not currently_building:
         oak_plank_location = find_image('oak_plank', inventory_location, 0.8)
 
-        if oak_plank_location and not waiting_on_butler:
+        if oak_plank_location and waiting_on_butler:
+            waiting_on_butler = False
+            return
+        
+        elif oak_plank_location and not waiting_on_butler:
             print("Building Construct")
 
             move(build_location)
