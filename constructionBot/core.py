@@ -189,7 +189,11 @@ def build_construct():
         construct_option_menu = find_image(f'{CONSTRUCT}_option_menu', screen_location, 0.8)
 
         if construct_option_menu and waiting_for_menu:
-            pyautogui.press('1')
+            if CONSTRUCT == "larder":
+                pyautogui.press('2')
+            else:
+                pyautogui.press('1')
+
             waiting_for_menu = False
             currently_removing = False
 
