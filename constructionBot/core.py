@@ -23,7 +23,6 @@ chat_location = get_chat_region(client_location)
 
 # Initiate Status Variables
 is_fetching_planks = False
-interacting_with_butler = False
 currently_building = False
 currently_removing = False
 waiting_for_menu = False
@@ -34,29 +33,34 @@ waiting_on_butler = False
 def wait_to_finish_interaction(status_image, confidence):
     waiting_to_finish_interaction = True
 
+    print("Waiting for interaction")
+
     while waiting_to_finish_interaction:
         interaction_status = find_image(status_image, chat_location, confidence)
 
         if not interaction_status:
             waiting_to_finish_interaction = False
+            print("Interaction finished")
 
         time.sleep(get_random_range(120, 150, 1000))
 
 
 def fetch_planks():
     global is_fetching_planks
-    global interacting_with_butler
 
     pyautogui.press('1')
 
     # Wait for butler to fetch planks
     wait_to_finish_interaction("butler_fetching_planks", 0.8)
 
+    print(f"Butler is fetching {PLANKS_COUNT} x Oak Planks")
+
     is_fetching_planks = True
-    interacting_with_butler = False
 
 
 def pay_butler():
+    print("Butler is requesting payment.")
+
     pyautogui.press('space')
 
     # Wait to pay butler
@@ -71,6 +75,8 @@ def pay_butler():
 
     # Wait to pay butler
     wait_to_finish_interaction("butler_payment_step_2", 0.8)
+
+    print("Butler has been paid.")
 
 
 def find_butler_location():
@@ -121,95 +127,76 @@ def check_butler_status():
 
 
 def check_butler():
-    global READY_TO_FETCH_STATUS
     global is_fetching_planks
-    global interacting_with_butler
     global waiting_on_butler
-    global waiting_for_removal
-    global currently_removing
 
     # Find butler
     butler_location = find_butler_location()
 
     if butler_location:
-        # Check Butler Status
-        # interacting_with_butler = False
-        butler_status = check_butler_status()
+        is_fetching_planks = False
 
-        if waiting_for_removal:
-            waiting_for_removal = False
-            currently_removing = False
+        if not waiting_on_butler:
+            move(butler_location)
 
-        if butler_status:
-            is_fetching_planks = False
-            ready_to_fetch_status = READY_TO_FETCH_STATUS
+            waiting_on_butler = True
 
-            match butler_status:
-                case "butler_requesting_payment":
+        elif waiting_on_butler:
+            # Check for Butler Status
+            butler_status = check_butler_status()
+
+            if butler_status:
+
+                if butler_status == REQUESTING_PAYMENT_STATUS:
                     pay_butler()
-                case ready_to_fetch_status:
+                    waiting_on_butler = False
+                elif butler_status == READY_TO_FETCH_STATUS:
                     fetch_planks()
                     waiting_on_butler = False
 
-        print(f"Butler is fetching planks: {is_fetching_planks}")
 
-        time.sleep(get_random_range(120, 150, 1000))
-
-        if not interacting_with_butler and not is_fetching_planks:
-            move(butler_location)
-
-            interacting_with_butler = True
-            waiting_for_butler_interaction = True
-
-            while waiting_for_butler_interaction:
-                curr_butler_status = check_butler_status()
-
-                if curr_butler_status and (curr_butler_status == ready_to_fetch_status or curr_butler_status == REQUESTING_PAYMENT_STATUS):
-                    waiting_for_butler_interaction = False
-
-                time.sleep(0.01)
-
-
-def build_construct():
+def build_construct(build_location):
+    global is_fetching_planks
     global currently_building
     global currently_removing
     global waiting_for_menu
+    global waiting_on_butler
 
     if not currently_building:
         oak_plank_location = find_image('oak_plank', inventory_location, 0.8)
 
-        if oak_plank_location:
-            build_location = find_construct(screen_location, f'{CONSTRUCT}_build')
+        if oak_plank_location and not waiting_on_butler:
+            print("Building Construct")
 
-            if build_location:
-                print("Building Construct")
+            move(build_location)
 
-                move(build_location)
+            currently_building = True
+            waiting_for_menu = True
 
-                currently_building = True
-                waiting_for_menu = True
-    else:
-        construct_option_menu = find_image(f'{CONSTRUCT}_option_menu', screen_location, 0.8)
+            while waiting_for_menu:
+                construct_option_menu = find_image(f'{CONSTRUCT}_option_menu', screen_location, 0.8)
 
-        if construct_option_menu and waiting_for_menu:
-            if CONSTRUCT == "larder":
-                pyautogui.press('2')
-            else:
-                pyautogui.press('1')
+                if construct_option_menu:
+                    if CONSTRUCT == "larder":
+                        pyautogui.press('2')
+                    else:
+                        pyautogui.press('1')
 
-            waiting_for_menu = False
-            currently_removing = False
+                    waiting_for_menu = False
+                    currently_removing = False
+
+                time.sleep(0.1)
+
+        elif not oak_plank_location:
+            is_fetching_planks = False
 
 
-
-def remove_construct():
+def remove_construct(remove_location):
     global currently_removing
     global currently_building
     global waiting_for_removal
 
     if not currently_removing:
-        remove_location = find_construct(screen_location, f'{CONSTRUCT}_remove')
-
         if remove_location and not waiting_for_removal:
             print("Removing Construct")
 
@@ -225,6 +212,19 @@ def remove_construct():
             currently_building = False
 
 
+def construct():
+    # Check state of Larder
+    build_location = find_construct(screen_location, f"{CONSTRUCT}_build")
+
+    if build_location:
+        build_construct(build_location)
+    else:
+        remove_location = find_construct(screen_location, f"{CONSTRUCT}_remove")
+
+        if remove_location and not waiting_on_butler:
+            remove_construct(remove_location)
+
+
 # TODO
 # Move status checks from functions above to while loop
 # Track if currently building or removing
@@ -238,8 +238,6 @@ while True:
 
     # Check if Butler is Fetching Planks
     if is_fetching_planks:
-        build_construct()
+        construct()
 
-        remove_construct()
-
-    time.sleep(0.01)
+    time.sleep(0.1)
