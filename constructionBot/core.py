@@ -3,6 +3,33 @@ from functions import *
 import sys
 
 
+arguments = sys.argv
+
+construct = arguments[1]
+planks = arguments[2]
+
+READY_TO_FETCH_STATUS = f"butler_ready_to_fetch_{planks}"
+REQUESTING_PAYMENT_STATUS = "butler_requesting_payment"
+
+# Get Image Search Locations
+client_title = 'Mausies Rat'
+print(client_title)
+
+client_location = get_client_region(client_title)
+screen_location = get_screen_region(client_location)
+inventory_location = get_inventory_region(client_location)
+chat_location = get_chat_region(client_location)
+
+# Initiate Status Variables
+is_fetching_planks = False
+interacting_with_butler = False
+currently_building = False
+currently_removing = False
+waiting_for_menu = False
+waiting_for_removal = False
+waiting_on_butler = False
+
+
 def wait_to_finish_interaction(status_image, confidence):
     waiting_to_finish_interaction = True
 
@@ -80,7 +107,7 @@ def find_construct(search_region, template):
 
 
 def check_butler_status():
-    statuses = [f"butler_ready_to_fetch_{planks}", "butler_requesting_payment", "butler_retrieved_planks"]
+    statuses = [READY_TO_FETCH_STATUS, "butler_requesting_payment", "butler_retrieved_planks"]
 
     for status in statuses:
         status_location = find_image(status, chat_location, 0.8)
@@ -116,7 +143,7 @@ def check_butler():
             match butler_status:
                 case "butler_requesting_payment":
                     pay_butler()
-                case f"butler_ready_to_fetch_{planks}":
+                case READY_TO_FETCH_STATUS:
                     fetch_planks()
                     waiting_on_butler = False
 
@@ -133,7 +160,7 @@ def check_butler():
             while waiting_for_butler_interaction:
                 curr_butler_status = check_butler_status()
 
-                if curr_butler_status and (curr_butler_status == f"butler_ready_to_fetch_{planks}" or curr_butler_status == "butler_requesting_payment"):
+                if curr_butler_status and (curr_butler_status == READY_TO_FETCH_STATUS or curr_butler_status == REQUESTING_PAYMENT_STATUS):
                     waiting_for_butler_interaction = False
 
                 time.sleep(0.1)
@@ -189,30 +216,6 @@ def remove_construct():
             waiting_for_removal = False
             currently_building = False
 
-
-arguments = sys.argv
-
-
-# Get Image Search Locations
-client_title = 'Mausies Rat'
-print(client_title)
-
-client_location = get_client_region(client_title)
-screen_location = get_screen_region(client_location)
-inventory_location = get_inventory_region(client_location)
-chat_location = get_chat_region(client_location)
-
-construct = arguments[1]
-planks = arguments[2]
-
-# Initiate Status Variables
-is_fetching_planks = False
-interacting_with_butler = False
-currently_building = False
-currently_removing = False
-waiting_for_menu = False
-waiting_for_removal = False
-waiting_on_butler = False
 
 # TODO
 # Move status checks from functions above to while loop
