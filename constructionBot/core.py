@@ -141,11 +141,12 @@ def check_butler():
 
         if butler_status:
             is_fetching_planks = False
+            ready_to_fetch_status = READY_TO_FETCH_STATUS
 
             match butler_status:
                 case "butler_requesting_payment":
                     pay_butler()
-                case READY_TO_FETCH_STATUS:
+                case ready_to_fetch_status:
                     fetch_planks()
                     waiting_on_butler = False
 
@@ -162,7 +163,7 @@ def check_butler():
             while waiting_for_butler_interaction:
                 curr_butler_status = check_butler_status()
 
-                if curr_butler_status and (curr_butler_status == READY_TO_FETCH_STATUS or curr_butler_status == REQUESTING_PAYMENT_STATUS):
+                if curr_butler_status and (curr_butler_status == ready_to_fetch_status or curr_butler_status == REQUESTING_PAYMENT_STATUS):
                     waiting_for_butler_interaction = False
 
                 time.sleep(0.01)
