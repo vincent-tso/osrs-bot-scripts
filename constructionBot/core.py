@@ -168,7 +168,7 @@ def build_construct(build_location):
         if oak_plank_location and waiting_on_butler:
             waiting_on_butler = False
             return
-        
+
         elif oak_plank_location and not waiting_on_butler:
             print("Building Construct")
 
@@ -189,7 +189,7 @@ def build_construct(build_location):
                     waiting_for_menu = False
                     currently_removing = False
 
-                time.sleep(0.1)
+                time.sleep(0.01)
 
         elif not oak_plank_location:
             is_fetching_planks = False
@@ -244,4 +244,4 @@ while True:
     if is_fetching_planks:
         construct()
 
-    time.sleep(0.1)
+    time.sleep(0.01)
