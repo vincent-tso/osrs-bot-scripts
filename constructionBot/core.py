@@ -40,7 +40,7 @@ def wait_to_finish_interaction(status_image, confidence):
         if not interaction_status:
             waiting_to_finish_interaction = False
 
-        time.sleep(get_random_range(120, 160, 1000))
+        time.sleep(get_random_range(120, 150, 1000))
 
 
 def fetch_planks():
@@ -120,6 +120,7 @@ def check_butler_status():
 
 
 def check_butler():
+    global READY_TO_FETCH_STATUS
     global is_fetching_planks
     global interacting_with_butler
     global waiting_on_butler
@@ -150,7 +151,7 @@ def check_butler():
 
         print(f"Butler is fetching planks: {is_fetching_planks}")
 
-        time.sleep(get_random_range(100, 150, 1000))
+        time.sleep(get_random_range(120, 150, 1000))
 
         if not interacting_with_butler and not is_fetching_planks:
             move(butler_location)
@@ -164,7 +165,7 @@ def check_butler():
                 if curr_butler_status and (curr_butler_status == READY_TO_FETCH_STATUS or curr_butler_status == REQUESTING_PAYMENT_STATUS):
                     waiting_for_butler_interaction = False
 
-                time.sleep(0.1)
+                time.sleep(0.01)
 
 
 def build_construct():
@@ -239,4 +240,4 @@ while True:
 
         remove_construct()
 
-    time.sleep(0.1)
+    time.sleep(0.01)
