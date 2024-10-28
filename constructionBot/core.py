@@ -1,6 +1,6 @@
 from PIL import ImageGrab
 from functions import *
-import pyautogui
+import sys
 
 
 def wait_to_finish_interaction(status_image, confidence):
@@ -80,7 +80,7 @@ def find_construct(search_region, template):
 
 
 def check_butler_status():
-    statuses = ["butler_ready_to_fetch_20", "butler_requesting_payment", "butler_retrieved_planks"]
+    statuses = [f"butler_ready_to_fetch_{planks}", "butler_requesting_payment", "butler_retrieved_planks"]
 
     for status in statuses:
         status_location = find_image(status, chat_location, 0.8)
@@ -114,9 +114,9 @@ def check_butler():
             is_fetching_planks = False
 
             match butler_status:
-                case 'butler_requesting_payment':
+                case "butler_requesting_payment":
                     pay_butler()
-                case 'butler_ready_to_fetch_20':
+                case f"butler_ready_to_fetch_{planks}":
                     fetch_planks()
                     waiting_on_butler = False
 
@@ -127,14 +127,14 @@ def check_butler():
         if not interacting_with_butler and not is_fetching_planks:
             move(butler_location)
 
+            interacting_with_butler = True
             waiting_for_butler_interaction = True
 
             while waiting_for_butler_interaction:
                 curr_butler_status = check_butler_status()
 
-                if curr_butler_status and (curr_butler_status == "butler_ready_to_fetch_20" or curr_butler_status == "butler_requesting_payment"):
+                if curr_butler_status and (curr_butler_status == f"butler_ready_to_fetch_{planks}" or curr_butler_status == "butler_requesting_payment"):
                     waiting_for_butler_interaction = False
-                    interacting_with_butler = True
 
                 time.sleep(0.1)
 
@@ -190,6 +190,9 @@ def remove_construct():
             currently_building = False
 
 
+arguments = sys.argv
+
+
 # Get Image Search Locations
 client_title = 'Mausies Rat'
 print(client_title)
@@ -199,7 +202,8 @@ screen_location = get_screen_region(client_location)
 inventory_location = get_inventory_region(client_location)
 chat_location = get_chat_region(client_location)
 
-construct = "door"
+construct = arguments[1]
+planks = arguments[2]
 
 # Initiate Status Variables
 is_fetching_planks = False
