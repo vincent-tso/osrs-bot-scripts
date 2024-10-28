@@ -5,14 +5,15 @@ import sys
 
 arguments = sys.argv
 
-construct = arguments[1]
-planks = arguments[2]
+ACCOUNT_NAME = arguments[1]
+CONSTRUCT = arguments[2]
+PLANKS_COUNT = arguments[3]
 
-READY_TO_FETCH_STATUS = f"butler_ready_to_fetch_{planks}"
+READY_TO_FETCH_STATUS = f"butler_ready_to_fetch_{PLANKS_COUNT}"
 REQUESTING_PAYMENT_STATUS = "butler_requesting_payment"
 
 # Get Image Search Locations
-client_title = 'Mausies Rat'
+client_title = ACCOUNT_NAME
 print(client_title)
 
 client_location = get_client_region(client_title)
@@ -175,7 +176,7 @@ def build_construct():
         oak_plank_location = find_image('oak_plank', inventory_location, 0.8)
 
         if oak_plank_location:
-            build_location = find_construct(screen_location, f'{construct}_build')
+            build_location = find_construct(screen_location, f'{CONSTRUCT}_build')
 
             if build_location:
                 print("Building Construct")
@@ -185,7 +186,7 @@ def build_construct():
                 currently_building = True
                 waiting_for_menu = True
     else:
-        construct_option_menu = find_image(f'{construct}_option_menu', screen_location, 0.8)
+        construct_option_menu = find_image(f'{CONSTRUCT}_option_menu', screen_location, 0.8)
 
         if construct_option_menu and waiting_for_menu:
             pyautogui.press('1')
@@ -200,7 +201,7 @@ def remove_construct():
     global waiting_for_removal
 
     if not currently_removing:
-        remove_location = find_construct(screen_location, f'{construct}_remove')
+        remove_location = find_construct(screen_location, f'{CONSTRUCT}_remove')
 
         if remove_location and not waiting_for_removal:
             print("Removing Construct")
