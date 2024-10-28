@@ -1,0 +1,2 @@
+# osrsBotScripts
+Custom Colour Bots
