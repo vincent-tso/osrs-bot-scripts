@@ -139,6 +139,57 @@ def check_butler():
                 time.sleep(0.1)
 
 
+def build_construct():
+    global currently_building
+    global currently_removing
+    global waiting_for_menu
+
+    if not currently_building:
+        oak_plank_location = find_image('oak_plank', inventory_location, 0.8)
+
+        if oak_plank_location:
+            build_location = find_construct(screen_location, f'{construct}_build')
+
+            if build_location:
+                print("Building Construct")
+
+                move(build_location)
+
+                currently_building = True
+                waiting_for_menu = True
+    else:
+        construct_option_menu = find_image(f'{construct}_option_menu', screen_location, 0.8)
+
+        if construct_option_menu and waiting_for_menu:
+            pyautogui.press('1')
+            waiting_for_menu = False
+            currently_removing = False
+
+
+
+def remove_construct():
+    global currently_removing
+    global currently_building
+    global waiting_for_removal
+
+    if not currently_removing:
+        remove_location = find_construct(screen_location, f'{construct}_remove')
+
+        if remove_location and not waiting_for_removal:
+            print("Removing Construct")
+
+            move(remove_location)
+            currently_removing = True
+            waiting_for_removal = True
+    else:
+        construct_remove_confirmation = find_image('remove_confirmation', chat_location, 0.8)
+
+        if construct_remove_confirmation and waiting_for_removal:
+            pyautogui.press('1')
+            waiting_for_removal = False
+            currently_building = False
+
+
 # Get Image Search Locations
 client_title = 'Mausies Rat'
 print(client_title)
@@ -172,48 +223,8 @@ while True:
 
     # Check if Butler is Fetching Planks
     if is_fetching_planks:
-        # Check if Construct is ready to build
-        build_location = find_construct(screen_location, f"{construct}_build")
+        build_construct()
 
-        if build_location:
-            # Check oak planks
-            oak_plank_location = find_image('oak_plank', inventory_location, 0.8)
-
-            if not oak_plank_location:
-                waiting_on_butler = True
-
-            if oak_plank_location and not waiting_on_butler:
-                # Check if not currently Building Larder
-                if not currently_building:
-                    print("Building Construct")
-                    currently_building = True
-                    move(build_location)
-                    currently_removing = False
-                    waiting_for_menu = True
-        else:
-            if currently_building:
-                # Check for creation option menu
-                construct_option_menu = find_image(f'{construct}_option_menu', screen_location, 0.8)
-
-                if construct_option_menu and waiting_for_menu:
-                    pyautogui.press('1')
-                    waiting_for_menu = False
-
-            # Check if not currently Removing Larder
-            if not currently_removing:
-                remove_location = find_construct(screen_location, f'{construct}_remove')
-
-                if remove_location and not waiting_for_removal:
-                    move(remove_location)
-                    print("Removing Construct")
-                    currently_removing = True
-                    currently_building = False
-                    waiting_for_removal = True
-
-            construct_remove_confirmation = find_image('remove_confirmation', chat_location, 0.8)
-
-            if construct_remove_confirmation:
-                pyautogui.press('1')
-                waiting_for_removal = False
+        remove_construct()
 
     time.sleep(0.1)
