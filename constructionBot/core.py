@@ -114,6 +114,7 @@ def check_butler_status():
         status_location = find_image(status, chat_location, 0.8)
 
         if status_location:
+            print(f"Butler status found: {status}")
             return status
 
     return None
