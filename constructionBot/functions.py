@@ -1,12 +1,10 @@
 from pywinauto import Application
-from PIL import ImageGrab
 import pyautogui
 import cv2
 import random
 import math
 import time
 import numpy as np
-import pytesseract
 
 pyautogui.PAUSE = 0
 TICK_INTERVAL = 0.6 # RuneScape tick duration in seconds
@@ -17,8 +15,6 @@ CHAT_LEFT = 0
 CHAT_TOP = 346
 CHAT_WIDTH = 532
 CHAT_HEIGHT = 134
-
-pytesseract.pytesseract.tesseract_cmd = r'C:\Users\Vincent\AppData\Local\Programs\Tesseract-OCR\tesseract.exe'
 
 def find_image(image, region, confidence):
     try:
