@@ -7,9 +7,8 @@ arguments = sys.argv
 
 ACCOUNT_NAME = arguments[1]
 CONSTRUCT = arguments[2]
-PLANKS_COUNT = arguments[3]
 
-READY_TO_FETCH_STATUS = f"butler_ready_to_fetch_{PLANKS_COUNT}"
+READY_TO_FETCH_STATUS = "butler_ready_to_fetch"
 REQUESTING_PAYMENT_STATUS = "butler_requesting_payment"
 
 # Get Image Search Locations
@@ -42,18 +41,19 @@ def wait_to_finish_interaction(status_image, confidence):
             waiting_to_finish_interaction = False
             print("Interaction finished")
 
-        time.sleep(get_random_range(120, 150, 1000))
+        time.sleep(0.1)
 
 
 def fetch_planks():
     global is_fetching_planks
 
     pyautogui.press('1')
+    time.sleep(0.1)
 
     # Wait for butler to fetch planks
     wait_to_finish_interaction("butler_fetching_planks", 0.8)
 
-    print(f"Butler is fetching {PLANKS_COUNT} x Oak Planks")
+    print("Butler is fetching Oak Planks")
 
     is_fetching_planks = True
 
@@ -62,16 +62,19 @@ def pay_butler():
     print("Butler is requesting payment.")
 
     pyautogui.press('space')
+    time.sleep(0.1)
 
     # Wait to pay butler
     wait_to_finish_interaction("butler_requesting_payment", 0.8)
 
     pyautogui.press('1')
+    time.sleep(0.1)
 
     # Wait to pay butler
     wait_to_finish_interaction("butler_payment_step_1", 0.8)
 
     pyautogui.press('space')
+    time.sleep(0.1)
 
     # Wait to pay butler
     wait_to_finish_interaction("butler_payment_step_2", 0.8)
@@ -114,7 +117,7 @@ def find_construct(search_region, template):
 
 
 def check_butler_status():
-    statuses = [READY_TO_FETCH_STATUS, "butler_requesting_payment", "butler_retrieved_planks"]
+    statuses = [READY_TO_FETCH_STATUS, REQUESTING_PAYMENT_STATUS]
 
     for status in statuses:
         status_location = find_image(status, chat_location, 0.8)
@@ -137,11 +140,14 @@ def check_butler():
         is_fetching_planks = False
 
         if not waiting_on_butler:
+            time.sleep(0.6)
+
             move(butler_location)
 
-            waiting_on_butler = True
+            time.sleep(0.6)
 
-        elif waiting_on_butler:
+            waiting_on_butler = True
+        else:
             # Check for Butler Status
             butler_status = check_butler_status()
 
@@ -189,7 +195,7 @@ def build_construct(build_location):
                     waiting_for_menu = False
                     currently_removing = False
 
-                time.sleep(0.01)
+                time.sleep(0.1)
 
         elif not oak_plank_location:
             is_fetching_planks = False
@@ -244,4 +250,4 @@ while True:
     if is_fetching_planks:
         construct()
 
-    time.sleep(0.01)
+    time.sleep(0.1)
