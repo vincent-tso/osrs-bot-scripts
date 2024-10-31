@@ -61,19 +61,19 @@ def fetch_planks():
 def pay_butler():
     print("Butler is requesting payment.")
 
-    pyautogui.press('space')
+    pydirectinput.press('space')
     time.sleep(0.1)
 
     # Wait to pay butler
     wait_to_finish_interaction("butler_requesting_payment", 0.8)
 
-    pyautogui.press('1')
+    pydirectinput.press('1')
     time.sleep(0.1)
 
     # Wait to pay butler
     wait_to_finish_interaction("butler_payment_step_1", 0.8)
 
-    pyautogui.press('space')
+    pydirectinput.press('space')
     time.sleep(0.1)
 
     # Wait to pay butler
@@ -188,9 +188,9 @@ def build_construct(build_location):
 
                 if construct_option_menu:
                     if CONSTRUCT == "larder":
-                        pyautogui.press('2')
+                        pydirectinput.press('2')
                     else:
-                        pyautogui.press('1')
+                        pydirectinput.press('1')
 
                     waiting_for_menu = False
                     currently_removing = False
@@ -217,7 +217,7 @@ def remove_construct(remove_location):
         construct_remove_confirmation = find_image('remove_confirmation', chat_location, 0.8)
 
         if construct_remove_confirmation and waiting_for_removal:
-            pyautogui.press('1')
+            pydirectinput.press('1')
             waiting_for_removal = False
             currently_building = False
 

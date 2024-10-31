@@ -5,6 +5,7 @@ import random
 import math
 import time
 import numpy as np
+import pydirectinput
 
 pyautogui.PAUSE = 0
 TICK_INTERVAL = 0.6 # RuneScape tick duration in seconds
@@ -22,6 +23,7 @@ def find_image(image, region, confidence):
     except:
         # print(f'Error: {image} could not be found.')
         return None
+
 
 def get_client_region(title):
     app = Application().connect(title=f'RuneLite - {title}')
@@ -63,22 +65,23 @@ def get_inventory_region(search_region):
 def get_random_range(start, end, divisor = 1):
     return random.randint(start, end) / divisor
 
-def click(image_location): # Click on item in inventory
-    rand_x = get_random_range(image_location.left, image_location.left + image_location.width)
-    rand_y = get_random_range(image_location.top, image_location.top + image_location.height)
-    centre_x, centre_y = pyautogui.center(image_location).x, pyautogui.center(image_location).y
-    pyautogui.click(centre_x + math.floor((((rand_x - centre_x) * 2) / 3)),
-                      centre_y + math.floor((((rand_y - centre_y) * 2) / 3)))
+# def click(image_location): # Click on item in inventory
+#     rand_x = get_random_range(image_location.left, image_location.left + image_location.width)
+#     rand_y = get_random_range(image_location.top, image_location.top + image_location.height)
+#     centre_x, centre_y = pyautogui.center(image_location).x, pyautogui.center(image_location).y
+#     pyautogui.click(centre_x + math.floor((((rand_x - centre_x) * 2) / 3)),
+#                       centre_y + math.floor((((rand_y - centre_y) * 2) / 3)))
 
 def move(image_location):  # Move cursor to 3d object on screen
     # rand_x = get_random_range(image_location[0], image_location[0] + image_location[2])
     # rand_y = get_random_range(image_location[1], image_location[1] + image_location[3])
     centre_x, centre_y = pyautogui.center(image_location).x, pyautogui.center(image_location).y
     # pyautogui.moveTo(centre_x + math.floor((rand_x - centre_x) / 3),
-    #                  centre_y + math.floor((rand_y - centre_y) / 3))
-    pyautogui.moveTo(centre_x, centre_y)
-    time.sleep(get_random_range(100, 150, 1000))
-    pyautogui.click()
+    #                  centre_y + math.floor((rand_y - centre_y) / 3)
+    # pyautogui.moveTo(centre_x, centre_y)
+    # time.sleep(get_random_range(100, 150, 1000))
+    # pyautogui.click()
+    pydirectinput.click(centre_x, centre_y)
 
 
 def find_template_location(search_region, screenshot, template, threshold=0.8):
